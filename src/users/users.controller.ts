@@ -33,9 +33,9 @@ export class UsersController {
         return this.usersService.findOne(session.userId);
     }
 
-    @Post('/signin')
-    signIn(@Body() body: CreateUserDto) {
-        return this.authService.signin(body.email, body.password);
+    @Post('/signout')
+    signout(@Session() session: any) {
+        session.userId = null;
     }
 
     @Get('/:id')
