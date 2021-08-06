@@ -14,20 +14,23 @@ export class UsersController {
         private authService: AuthService    
     ) {}
 
-    @Post('/colors/:color')
-    setColor(@Param('color') color: string, @Session() session: any) {
-        session.color = color;
-    }
-
-    @Get('/colors')
-    getColor(@Session() session: any) {
-        return session.color;
-    }
-
-
     @Post('/signup')
-    createUser(@Body() body: CreateUserDto) {
-        return this.authService.signup(body.email, body.password);
+    async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signup(body.email, body.password);
+        session.userId = user.id;
+        return user;
+    }
+
+    @Post('/signin')
+    async signIn(@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signin(body.email, body.password);
+        session.userId = user.id;
+        return user;
+    }
+
+    @Get('/me')
+    async whoAmI(@Session() session: any) {
+        return this.usersService.findOne(session.userId);
     }
 
     @Post('/signin')
