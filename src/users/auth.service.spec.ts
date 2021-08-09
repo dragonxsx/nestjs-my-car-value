@@ -1,3 +1,4 @@
+import { BadRequestException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { AuthService } from "./auth.service";
 import { User } from "./user.entity";
@@ -40,9 +41,17 @@ describe('AuthService', () => {
         expect(hash).toBeDefined();
     });
 
-    it('throws an error if user signs up with email that is in used', (done) => {
+    it('throws an error if user signs up with email that is in used', async () => {
         fakeUsersService.find = () => Promise.resolve([{id: 1, email: 'as', password: 'wsdsad'} as User]);
-        service.signup('asdf@asdf.com', 'asdf').catch(e => done());
+
+        // expect.assertions(2);
+
+        try {
+            await service.signup('asdf@asdf.com', 'asdf')
+        } catch (err) {
+            expect(err).toBeInstanceOf(BadRequestException);
+            expect(err.message).toEqual('email in use');
+        }
     });
 })
 
