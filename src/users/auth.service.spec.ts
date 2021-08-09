@@ -5,9 +5,11 @@ import { UsersService } from "./users.service";
 
 describe('AuthService', () => {
     let service: AuthService;
+    let fakeUsersService: Partial<UsersService>;
+
     beforeEach(async() => {
         // Create a fake copy of users service
-        const fakeUsersService : Partial<UsersService> = {
+        fakeUsersService = {
             find: () => Promise.resolve([]),
             create: (email: string, password: string) => Promise.resolve({id: 1, email, password} as User)
         };
@@ -36,7 +38,11 @@ describe('AuthService', () => {
         const [salt, hash] = user.password.split('.');
         expect(salt).toBeDefined();
         expect(hash).toBeDefined();
-    })
+    });
 
+    it('throws an error if user signs up with email that is in used', (done) => {
+        fakeUsersService.find = () => Promise.resolve([{id: 1, email: 'as', password: 'wsdsad'} as User]);
+        service.signup('asdf@asdf.com', 'asdf').catch(e => done());
+    });
 })
 
