@@ -24,7 +24,9 @@ describe('UsersController', () => {
 
     fakeAuthService = {
       // signup: () => {},
-      // signin: () => {}
+      signin: (email: string, password: string) => {
+        return Promise.resolve({id: 1, email, password} as User);
+      }
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -67,5 +69,13 @@ describe('UsersController', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(NotFoundException);
     }
+  });
+
+  it('signin updates session object and returns user', async () => {
+    const session = {userId: -1};
+    const user = await controller.signIn({email: 'asdas@asd.com', password: 'asdd'}, session);
+
+    expect(user).toBeDefined();
+    expect(session.userId).toEqual(user.id);
   });
 });
