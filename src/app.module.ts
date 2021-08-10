@@ -19,6 +19,14 @@ import { Report } from './reports/report.entity';
     ReportsModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true
+      })
+    }
+  ],
 })
 export class AppModule {}
