@@ -10,9 +10,18 @@ describe('AuthService', () => {
 
     beforeEach(async() => {
         // Create a fake copy of users service
+        const users: User[] = [];
+
         fakeUsersService = {
-            find: () => Promise.resolve([]),
-            create: (email: string, password: string) => Promise.resolve({id: 1, email, password} as User)
+            find: (email: string) => {
+                const filteredUsers = users.filter(user => user.email === email);
+                return Promise.resolve(filteredUsers);
+            },
+            create: (email: string, password: string) => {
+                const user = {id: users.length,email, password} as User;
+                users.push(user);
+                return Promise.resolve(user);
+            }
         };
 
         const module = await Test.createTestingModule({
@@ -42,12 +51,11 @@ describe('AuthService', () => {
     });
 
     it('throws an error if user signs up with email that is in used', async () => {
-        fakeUsersService.find = () => Promise.resolve([{id: 1, email: 'as', password: 'wsdsad'} as User]);
-
-        // expect.assertions(2);
+        expect.assertions(2);
+        await service.signup('asdf@asdf.com', 'asdf');
 
         try {
-            await service.signup('asdf@asdf.com', 'asdf')
+            await service.signup('asdf@asdf.com', 'asdf');
         } catch (err) {
             expect(err).toBeInstanceOf(BadRequestException);
             expect(err.message).toEqual('email in use');
@@ -55,6 +63,7 @@ describe('AuthService', () => {
     });
 
     it('throws an error if signin is called with an unused email', async() => {
+        expect.assertions(1);
         try {
             await service.signin('a@awdas.com', 'asdsd');
         } catch (err) {
@@ -62,11 +71,12 @@ describe('AuthService', () => {
         }
     });
 
-        fakeUsersService.find = () => Promise.resolve([{email: 'a@asd.com', password: '123'} as User]);
-
     it('throws an error if an invalid password is provided', async () => {
+        expect.assertions(2);
+        await service.signup('asd@12e.com', 'password');
+        
         try {
-            await service.signin('asd@12e.com', 'password');
+            await service.signin('asd@12e.com', 'passwordXXXXX');
         } catch (err) {
             expect(err).toBeInstanceOf(BadRequestException);
             expect(err.message).toEqual('bad password');
@@ -75,8 +85,6 @@ describe('AuthService', () => {
 
     it('returns a user if correct password is provided', async () => {
         const user = await service.signup('asdsad@123.com', 'myPassword');
-        fakeUsersService.find = () => Promise.resolve([{email: user.email, password: user.password} as User]);
-
         const existedUser = await service.signin(user.email, 'myPassword');
         expect(existedUser).toBeDefined();
 
