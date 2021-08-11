@@ -29,6 +29,24 @@ describe('AppController (e2e)', () => {
                 const { email, id } = res.body;
                 expect(id).toBeDefined();
                 expect(email).toEqual(user.email);
-            });
-        });
+          });
+    });
+
+    it('signup as a new user then get the currently logged in user', async () => {
+      const email = 'skfajdsf@asj.com';
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/signup')
+        .send({email, password: 'asdcv'})
+        .expect(201);
+
+      const cookie = res.get('Set-Cookie');
+
+      const {body} = await request(app.getHttpServer())
+        .get('/auth/me')
+        .set('Cookie', cookie)
+        .expect(200);
+
+      expect(body.email).toEqual(email);
+    })
 });
