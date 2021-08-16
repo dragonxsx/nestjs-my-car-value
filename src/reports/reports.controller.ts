@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { AdminGuard } from 'src/guards/admin.guard';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { CurrentUser } from 'src/users/decorators/current-user.decorator';
-import { User } from 'src/users/user.entity';
+import { AdminGuard } from '../guards/admin.guard';
+import { AuthGuard } from '../guards/auth.guard';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { CurrentUser } from '../users/decorators/current-user.decorator';
+import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
